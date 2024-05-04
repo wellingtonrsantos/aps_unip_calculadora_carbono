@@ -1,10 +1,17 @@
-CREDITO_CARBONO_VALOR = 89.05
+CREDITO_CARBONO_VALOR = 168.19
+
+FATOR_EMISSAO = {
+    '1': 1.68392,   # Gasolina
+    '2': 2.38069,   # Diesel
+    '3': 0.00050,   # Eletrico
+    '4': 0.01415    # Etanol
+}
 
 
-def calculo(coeficientes):
+def calcular_emissao_carbono():
     while True:
         try:
-            valor_quilometro = (
+            quilometros_percorridos = (
                 float(input('\nDigite a quantidade de quilômetros rodados por um tipo de veículo (Km): '))
             )
             break
@@ -25,38 +32,29 @@ def calculo(coeficientes):
         except ValueError:
             print('Resposta inválida, por favor, digite somente números!')
 
-    coeficiente = coeficientes.get(tipo_combustivel)
-    quantidade_carbono = (valor_quilometro / valor_consumo_combustivel) * coeficiente
-
-    return quantidade_carbono
+    fator_emissao = FATOR_EMISSAO.get(tipo_combustivel)
+    return (quilometros_percorridos / valor_consumo_combustivel) * fator_emissao
 
 
-def calcular_consumo(coeficientes, ano):
-    quantidade_carbono = 0
+def calcular_consumo(ano):
+    quantidade_emissao_carbono = 0
 
     print(f'\nAgora, responda com os valores referentes ao {ano} ano da comparação.')
-    quantidade_carbono += calculo(coeficientes)
+    quantidade_emissao_carbono += calcular_emissao_carbono()
 
     while True:
         adicionar_mais_consumo = input(f'\nDeseja adicionar mais algum consumo nesse {ano} ano? (S/N) ').strip().lower()
         if adicionar_mais_consumo == 's':
-            quantidade_carbono += calculo(coeficientes)
+            quantidade_emissao_carbono += calcular_emissao_carbono()
         elif adicionar_mais_consumo == 'n':
             break
         else:
             print('Resposta inválida, responda com S(sim) ou N(não)')
 
-    return quantidade_carbono
+    return quantidade_emissao_carbono
 
 
 def main():
-    coeficientes = {
-        '1': 0.00407,
-        '2': 0.00468,
-        '3': 0.00084,
-        '4': 0.0022755
-    }
-
     print('************************************************')
     print('*Bem-vindo a calculadora de crédito de carbono!*')
     print('************************************************')
@@ -69,22 +67,22 @@ def main():
         print('Calculadora encerrada.')
         return
 
-    quantidade_carbono_primeiro_ano = calcular_consumo(coeficientes, "primeiro")
-    quantidade_carbono_segundo_ano = calcular_consumo(coeficientes, "segundo")
+    quantidade_carbono_primeiro_ano = calcular_consumo("primeiro")
+    quantidade_carbono_segundo_ano = calcular_consumo("segundo")
 
-    diferenca = quantidade_carbono_primeiro_ano - quantidade_carbono_segundo_ano
-    valor_em_reais = CREDITO_CARBONO_VALOR * diferenca
+    diferenca_anos = quantidade_carbono_primeiro_ano - quantidade_carbono_segundo_ano
+    valor_em_reais = CREDITO_CARBONO_VALOR * diferenca_anos
 
-    if diferenca > 0:
-        print(f'\nParabéns! Você adquiriu {diferenca:0.2f} créditos de carbono.')
+    if diferenca_anos > 0:
+        print(f'\nParabéns! Você adquiriu {diferenca_anos:0.2f} créditos de carbono.')
         print(f'Com isso, você receberá {valor_em_reais:0.2f} reais na venda desses créditos! ')
-    elif diferenca == 0:
-        print(f'\nSeu consumo foi igual nos dois anos! Logo, você não adquiriu nenhum crédito de carbono.')
+    elif diferenca_anos == 0:
+        print('\nSeu consumo foi igual nos dois anos! Logo, você não adquiriu nenhum crédito de carbono.')
     else:
-        diferenca = abs(diferenca)
-        print(f'\nInfelizmente, suas emissões aumentaram em {diferenca:.2f}!')
+        diferenca_anos = abs(diferenca_anos)
+        print(f'\nInfelizmente, suas emissões aumentaram em {diferenca_anos:.2f}!')
         print(f'Portanto, para compensar o aumento de emissões, '
-              f'você deve comprar {diferenca:0.2f} créditos de carbono!')
+              f'você deve comprar {diferenca_anos:0.2f} créditos de carbono!')
         print(f'Para isso, você deverá desembolsar {valor_em_reais:0.2f} reais.')
 
 
